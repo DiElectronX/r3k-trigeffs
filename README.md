@@ -18,7 +18,7 @@ cd .../r3k-trigeffs
 cmsenv
 ```
 
-## Orthogonal Dataset Method (Double-Muon Trigger) [WIP porting code to GIT]
+## Orthogonal Dataset Method (Double-Muon Trigger) [WIP porting code to Git]
 
 ### Skimming NanoAOD files
 
