@@ -44,7 +44,7 @@ Code is broken now but it shows the process of how the efficiency plots are calc
 This code reads the histograms from the previous step, performs a simplified fit of the J/Psi peak to obtain a signal yield, and uses the yields to generate trigger efficiency plots.
 
 ```
-python calculate_efficiencies.py
+python plot_efficiencies.py
 ```
 
 
