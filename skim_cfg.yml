@@ -32,91 +32,91 @@ config:
 
 datasets:
   test:
-    files : ['/eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass0/Run3_ParkingDoubleMuonLowMass0_2022C_v1_Nano/221215_115329/0000/output_142.root']
+    files : ['/eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass0/Run3_ParkingDoubleMuonLowMass0_2022C_v1_Nano/221215_115329/0000/output_142.root']
     output_path : .
     json_path   : /uscms/home/nzipper/nobackup/Rk/Analysis/CMSSW_10_4_0/src/PhysicsTools/NanoAODTools/JSON/Eras_C_Dv1_Dv2
     preselection: *preselection_data
 
   BuToKJpsi_Toee:
     files : ['/eos/cms/store/group/phys_bphys/DiElectronX/nzipper/BuTOjpsiKEE/*.root']
-    output_path : ./
+    output_path : .
     json_path   : /uscms/home/nzipper/nobackup/Rk/Analysis/CMSSW_10_4_0/src/PhysicsTools/NanoAODTools/JSON/Eras_C_Dv1_Dv2
     preselection: *preselection_mc
 
-  2022C:
+  ParkingDoubleMuonLowMass_2022C:
     files :
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass0/Run3_ParkingDoubleMuonLowMass0_2022C_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass1/Run3_ParkingDoubleMuonLowMass1_2022C_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass2/Run3_ParkingDoubleMuonLowMass2_2022C_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass3/Run3_ParkingDoubleMuonLowMass3_2022C_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass4/Run3_ParkingDoubleMuonLowMass4_2022C_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass5/Run3_ParkingDoubleMuonLowMass5_2022C_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass6/Run3_ParkingDoubleMuonLowMass6_2022C_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass7/Run3_ParkingDoubleMuonLowMass7_2022C_v1_Nano/*/*/*.root
-    output_path : /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022C
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass0/Run3_ParkingDoubleMuonLowMass0_2022C_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass1/Run3_ParkingDoubleMuonLowMass1_2022C_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass2/Run3_ParkingDoubleMuonLowMass2_2022C_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass3/Run3_ParkingDoubleMuonLowMass3_2022C_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass4/Run3_ParkingDoubleMuonLowMass4_2022C_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass5/Run3_ParkingDoubleMuonLowMass5_2022C_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass6/Run3_ParkingDoubleMuonLowMass6_2022C_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass7/Run3_ParkingDoubleMuonLowMass7_2022C_v1_Nano/*/*/*.root
+    output_path : /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMassSkims/2022C
     json_path   : /afs/cern.ch/work/n/nzipper/public/Rk/Files/JSON/Eras_CDEFG
     preselection: *preselection_data
 
-  2022D:
+  ParkingDoubleMuonLowMass_2022D:
     files :
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass0/Run3_ParkingDoubleMuonLowMass0_2022D_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass1/Run3_ParkingDoubleMuonLowMass1_2022D_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass2/Run3_ParkingDoubleMuonLowMass2_2022D_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass3/Run3_ParkingDoubleMuonLowMass3_2022D_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass4/Run3_ParkingDoubleMuonLowMass4_2022D_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass5/Run3_ParkingDoubleMuonLowMass5_2022D_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass6/Run3_ParkingDoubleMuonLowMass6_2022D_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass7/Run3_ParkingDoubleMuonLowMass7_2022D_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass0/Run3_ParkingDoubleMuonLowMass0_2022D_v2_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass1/Run3_ParkingDoubleMuonLowMass1_2022D_v2_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass2/Run3_ParkingDoubleMuonLowMass2_2022D_v2_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass3/Run3_ParkingDoubleMuonLowMass3_2022D_v2_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass4/Run3_ParkingDoubleMuonLowMass4_2022D_v2_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass5/Run3_ParkingDoubleMuonLowMass5_2022D_v2_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass6/Run3_ParkingDoubleMuonLowMass6_2022D_v2_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass7/Run3_ParkingDoubleMuonLowMass7_2022D_v2_Nano/*/*/*.root
-    output_path : /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022D
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass0/Run3_ParkingDoubleMuonLowMass0_2022D_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass1/Run3_ParkingDoubleMuonLowMass1_2022D_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass2/Run3_ParkingDoubleMuonLowMass2_2022D_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass3/Run3_ParkingDoubleMuonLowMass3_2022D_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass4/Run3_ParkingDoubleMuonLowMass4_2022D_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass5/Run3_ParkingDoubleMuonLowMass5_2022D_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass6/Run3_ParkingDoubleMuonLowMass6_2022D_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass7/Run3_ParkingDoubleMuonLowMass7_2022D_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass0/Run3_ParkingDoubleMuonLowMass0_2022D_v2_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass1/Run3_ParkingDoubleMuonLowMass1_2022D_v2_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass2/Run3_ParkingDoubleMuonLowMass2_2022D_v2_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass3/Run3_ParkingDoubleMuonLowMass3_2022D_v2_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass4/Run3_ParkingDoubleMuonLowMass4_2022D_v2_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass5/Run3_ParkingDoubleMuonLowMass5_2022D_v2_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass6/Run3_ParkingDoubleMuonLowMass6_2022D_v2_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass7/Run3_ParkingDoubleMuonLowMass7_2022D_v2_Nano/*/*/*.root
+    output_path : /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMassSkims/2022D
     json_path   : /afs/cern.ch/work/n/nzipper/public/Rk/Files/JSON/Eras_CDEFG
     preselection: *preselection_data
 
-  2022E:
+  ParkingDoubleMuonLowMass_2022E:
     files :
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass0/Run3_ParkingDoubleMuonLowMass0_2022E_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass1/Run3_ParkingDoubleMuonLowMass1_2022E_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass2/Run3_ParkingDoubleMuonLowMass2_2022E_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass3/Run3_ParkingDoubleMuonLowMass3_2022E_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass4/Run3_ParkingDoubleMuonLowMass4_2022E_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass5/Run3_ParkingDoubleMuonLowMass5_2022E_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass6/Run3_ParkingDoubleMuonLowMass6_2022E_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass7/Run3_ParkingDoubleMuonLowMass7_2022E_v1_Nano/*/*/*.root
-    output_path : /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022E
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass0/Run3_ParkingDoubleMuonLowMass0_2022E_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass1/Run3_ParkingDoubleMuonLowMass1_2022E_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass2/Run3_ParkingDoubleMuonLowMass2_2022E_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass3/Run3_ParkingDoubleMuonLowMass3_2022E_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass4/Run3_ParkingDoubleMuonLowMass4_2022E_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass5/Run3_ParkingDoubleMuonLowMass5_2022E_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass6/Run3_ParkingDoubleMuonLowMass6_2022E_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass7/Run3_ParkingDoubleMuonLowMass7_2022E_v1_Nano/*/*/*.root
+    output_path : /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMassSkims/2022E
     json_path   : /afs/cern.ch/work/n/nzipper/public/Rk/Files/JSON/Eras_CDEFG
     preselection: *preselection_data
 
-  2022F:
+  ParkingDoubleMuonLowMass_2022F:
     files :
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass0/Run3_ParkingDoubleMuonLowMass0_2022F_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass1/Run3_ParkingDoubleMuonLowMass1_2022F_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass2/Run3_ParkingDoubleMuonLowMass2_2022F_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass3/Run3_ParkingDoubleMuonLowMass3_2022F_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass4/Run3_ParkingDoubleMuonLowMass4_2022F_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass5/Run3_ParkingDoubleMuonLowMass5_2022F_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass6/Run3_ParkingDoubleMuonLowMass6_2022F_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass7/Run3_ParkingDoubleMuonLowMass7_2022F_v1_Nano/*/*/*.root
-    output_path : /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022F
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass0/Run3_ParkingDoubleMuonLowMass0_2022F_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass1/Run3_ParkingDoubleMuonLowMass1_2022F_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass2/Run3_ParkingDoubleMuonLowMass2_2022F_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass3/Run3_ParkingDoubleMuonLowMass3_2022F_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass4/Run3_ParkingDoubleMuonLowMass4_2022F_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass5/Run3_ParkingDoubleMuonLowMass5_2022F_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass6/Run3_ParkingDoubleMuonLowMass6_2022F_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass7/Run3_ParkingDoubleMuonLowMass7_2022F_v1_Nano/*/*/*.root
+    output_path : /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMassSkims/2022F
     json_path   : /afs/cern.ch/work/n/nzipper/public/Rk/Files/JSON/Eras_CDEFG
     preselection: *preselection_data
 
-  2022G:
+  ParkingDoubleMuonLowMass_2022G:
     files :
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass0/Run3_ParkingDoubleMuonLowMass0_2022G_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass1/Run3_ParkingDoubleMuonLowMass1_2022G_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass2/Run3_ParkingDoubleMuonLowMass2_2022G_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass3/Run3_ParkingDoubleMuonLowMass3_2022G_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass4/Run3_ParkingDoubleMuonLowMass4_2022G_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass5/Run3_ParkingDoubleMuonLowMass5_2022G_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass6/Run3_ParkingDoubleMuonLowMass6_2022G_v1_Nano/*/*/*.root
-      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass7/Run3_ParkingDoubleMuonLowMass7_2022G_v1_Nano/*/*/*.root
-    output_path : /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022G
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass0/Run3_ParkingDoubleMuonLowMass0_2022G_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass1/Run3_ParkingDoubleMuonLowMass1_2022G_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass2/Run3_ParkingDoubleMuonLowMass2_2022G_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass3/Run3_ParkingDoubleMuonLowMass3_2022G_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass4/Run3_ParkingDoubleMuonLowMass4_2022G_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass5/Run3_ParkingDoubleMuonLowMass5_2022G_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass6/Run3_ParkingDoubleMuonLowMass6_2022G_v1_Nano/*/*/*.root
+      - /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMass7/Run3_ParkingDoubleMuonLowMass7_2022G_v1_Nano/*/*/*.root
+    output_path : /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMassSkims/2022G
     json_path   : /afs/cern.ch/work/n/nzipper/public/Rk/Files/JSON/Eras_CDEFG
     preselection: *preselection_data
