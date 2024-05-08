@@ -62,14 +62,13 @@ def main(args):
                     job_dict['preselection'] = params['preselection']
                     job_dict['idx'] = idx
                     job_configs.append(job_dict)
-
             else:
                 job_dict = {}
                 job_dict['json'] = None
                 job_dict['output_path'] = ''.join([params['output_path'] , '/Preselection'])
-                job_dict['files'] = files
+                job_dict['files'] = params['files']
                 job_dict['preselection'] = params['preselection']
-                job_dict['idx'] = idx
+                job_dict['idx'] = 0
                 job_configs.append(job_dict)
 
     if 'mp' in cfg['config']['run_strategy']:

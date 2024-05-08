@@ -25,7 +25,7 @@ cmsenv
 For ease of use, loose pre-selection cuts are applied to slim data size and allow interactive production of trigger efficiency results.
 
 ```
-python skim_nanoaod.py
+python skim_nanoaod.py [-d <list of datasets in cfg file to run over. Default is everything>] [-v]
 ```
 
 ### Calculating Efficiencies
