@@ -1,0 +1,88 @@
+
+run_strategy: linear
+
+
+jobs:
+  - name: test
+    input_files: "/eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMass_NanoAOD/ParkingDoubleMuonLowMassSkims/2022G_new/Preselection/output_22*.root"
+    output_dir: eff_hists/test
+    json_dir: json_files/Eras_CDEFG
+    mc: False
+    presel: null
+
+  # - name: BuToKee
+  #   input_files: 
+  #   output_dir: eff_hists/BuToKee
+  #   json_dir: null
+  #   presel: null
+
+  # - name: BuToKJpsi_Toee_baseline_Tight
+  #   input_files: /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/BuTOjpsiKEESkims/*.root
+  #   output_dir: eff_hists/mc/BuToKJpsi_Toee
+  #   json_dir: null
+  #   presel: null
+
+  # - name: 2022C
+  #   input_files: /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022C/Preselection/*.root
+  #   output_dir: eff_hists/data/data_baseline_excl
+  #   json_dir: json_files/Eras_CDEFG
+  #   presel: null
+
+  # - name: 2022D
+  #   input_files: /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022D/Preselection/*.root
+  #   output_dir: eff_hists/data/data_baseline_excl
+  #   json_dir: json_files/Eras_CDEFG
+  #   presel: null
+
+  # - name: 2022E
+  #   input_files: /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022E/Preselection/*.root
+  #   output_dir: eff_hists/data/data_baseline_excl
+  #   json_dir: json_files/Eras_CDEFG
+  #   presel: null
+
+  # - name: 2022F
+  #   input_files: /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022F/Preselection/*.root
+  #   output_dir: eff_hists/data/data_baseline_excl
+  #   json_dir: json_files/Eras_CDEFG
+  #   presel: null
+
+  # - name: 2022G
+  #   input_files: /eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022G/Preselection/*.root
+  #   output_dir: eff_hists/data/data_baseline_excl
+  #   json_dir: json_files/Eras_CDEFG
+  #   presel: null
+
+triggers:
+  - trigger_OR
+  # - L1_11p0_HLT_6p5_Incl_Final
+  # - L1_10p5_HLT_6p5_Incl_Final
+  # - L1_10p5_HLT_5p0_Incl_Final
+  # - L1_9p0_HLT_6p0_Incl_Final
+  # - L1_8p5_HLT_5p5_Incl_Final
+  # - L1_8p5_HLT_5p0_Incl_Final
+  # - L1_8p0_HLT_5p0_Incl_Final
+  # - L1_7p5_HLT_5p0_Incl_Final
+  # - L1_7p0_HLT_5p0_Incl_Final
+  # - L1_6p5_HLT_4p5_Incl_Final
+  # - L1_6p0_HLT_4p0_Incl_Final
+  # - L1_5p5_HLT_6p0_Incl_Final
+  # - L1_5p5_HLT_4p0_Incl_Final
+  # - L1_5p0_HLT_4p0_Incl_Final
+  # - L1_4p5_HLT_4p0_Incl_Final
+  - L1_11p0_HLT_6p5_Excl_Final
+  - L1_10p5_HLT_6p5_Excl_Final
+  - L1_10p5_HLT_5p0_Excl_Final
+  - L1_9p0_HLT_6p0_Excl_Final
+  - L1_8p5_HLT_5p5_Excl_Final
+  - L1_8p5_HLT_5p0_Excl_Final
+  - L1_8p0_HLT_5p0_Excl_Final
+  - L1_7p5_HLT_5p0_Excl_Final
+  - L1_7p0_HLT_5p0_Excl_Final
+  - L1_6p5_HLT_4p5_Excl_Final
+  - L1_6p0_HLT_4p0_Excl_Final
+  - L1_5p5_HLT_6p0_Excl_Final
+  - L1_5p5_HLT_4p0_Excl_Final
+  - L1_5p0_HLT_4p0_Excl_Final
+  - L1_4p5_HLT_4p0_Excl_Final
+
+

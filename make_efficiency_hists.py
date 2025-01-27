@@ -1,27 +1,47 @@
 #!/usr/bin/env python
 import os
 import glob
-import sys
 import time
+import argparse
+import yaml
 import numpy as np
-from importlib import import_module
-import multiprocessing
+# from importlib import import_module
+from pathlib import Path
+import multiprocessing as mp
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
+
+class DotDict(dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for key, value in self.items():
+            if isinstance(value, dict):
+                self[key] = DotDict(value)
+
+    def __getattr__(self, key):
+        return self.get(key, False)
+
+    def __setattr__(self, key, value):
+        self[key] = DotDict(value) if isinstance(value, dict) else value
+
+    def __delattr__(self, key):
+        if key in self: del self[key]
+        else: raise AttributeError(f"No attribute named {key}")
+
+
 def assign_frac_trig(idx, lints, entries):
-    frac_evts = np.around((lints / np.sum(lints) * entries))
+    frac_evts = np.round((lints / np.sum(lints) * entries))
     idxs = np.cumsum(frac_evts)
     return np.digitize(idx,idxs)
 
-def isB(part):
-    return (np.abs(part.pdgId) % 1000) // 100 == 5
 
-def isJPsi(part):
-    return np.abs(part.pdgId) == 443
+isB = lambda p : (np.abs(p.pdgId) % 1000) // 100 == 5
+isJPsi = lambda p : np.abs(p.pdgId) == 443
+
 
 def getBtoJPsi(parts, idx=False):
     j_idx = np.array(map(isJPsi, parts)).argmax()
@@ -31,6 +51,7 @@ def getBtoJPsi(parts, idx=False):
     else: 
         out = b_idx if idx else parts[b_idx]
     return out
+
 
 def getOtherB(parts, idx=False):
     excluded_Bs = []
@@ -61,20 +82,24 @@ def getOtherB(parts, idx=False):
 
 
 class TriggerEfficiencyProducer(Module):
-    def __init__(self, trigger_paths, isMC=False):
-        self.trigger_paths = trigger_paths
+    def __init__(self, params, isMC=False):
+        self.params = DotDict(params)
+        self.trigger_paths = self.params.triggers
         self.isMC = isMC
         self.writeHistFile = True
+
 
     def make_th1(self, name, xbins):
         h = ROOT.TH1F(name, name, len(xbins)-1, xbins)
         self.addObject(h)
         return h
 
+
     def make_th2(self, name, xbins, ybins):
         h = ROOT.TH2F(name, name, len(xbins)-1, xbins, len(ybins)-1, ybins)
         self.addObject(h)
         return h
+
 
     def beginJob(self, histFile=None, histDirName=None):
         Module.beginJob(self, histFile, histDirName)
@@ -88,29 +113,29 @@ class TriggerEfficiencyProducer(Module):
         self.diept_bins  = np.array([5, 10, 11, 12, 15, 20, 40, 70, 999], dtype=np.double)
         
         # Kinematic plots
-        self.h_el_pt                        = ROOT.TH1F('el_pt', 'el_pt', 500, 0, 100); self.addObject(self.h_el_pt)
-        self.h_el_eta                       = ROOT.TH1F('el_eta', 'el_eta', 100, -2, 2); self.addObject(self.h_el_eta)
-        self.h_el_phi                       = ROOT.TH1F('el_phi', 'el_phi', 100, -4, 4); self.addObject(self.h_el_phi)
-        self.h_lead_el_pt                   = ROOT.TH1F('lead_el_pt', 'lead_el_pt', 500, 0, 100); self.addObject(self.h_lead_el_pt)
-        self.h_sublead_el_pt                = ROOT.TH1F('sublead_el_pt', 'sublead_el_pt', 500, 0, 100); self.addObject(self.h_sublead_el_pt)
-        self.h_sublead_el_eta               = ROOT.TH1F('sublead_el_eta', 'sublead_el_eta', 100, -2, 2); self.addObject(self.h_sublead_el_eta)
-        self.h_sublead_el_phi               = ROOT.TH1F('sublead_el_phi', 'sublead_el_phi', 100, -4, 4); self.addObject(self.h_sublead_el_phi)
-        self.h_diel_m                       = ROOT.TH1F('diel_m', 'diel_m', 100, 2, 4); self.addObject(self.h_diel_m)
-        self.h_dr                           = ROOT.TH1F('dr', 'dr', 100, 0, 4); self.addObject(self.h_dr)
-        self.h_npv                          = ROOT.TH1F('npv', 'npv', 80, 0, 80); self.addObject(self.h_npv)
-        self.h_diel_pt                      = ROOT.TH1F('diel_pt', 'diel_pt', 500, 0, 100); self.addObject(self.h_diel_pt)
-        self.h2_sublead_el_pt_dr            = self.make_th2('sublead_el_pt_dr', self.pt_bins,  self.dr_bins)
+        self.h_el_pt             = self.make_th1('el_pt', np.linspace(0, 100, 500, dtype=np.double))
+        self.h_el_eta            = self.make_th1('el_eta', np.linspace(-2, 2, 80, dtype=np.double))
+        self.h_el_phi            = self.make_th1('el_phi', np.linspace(-4, 4, 100, dtype=np.double))
+        self.h_lead_el_pt        = self.make_th1('lead_el_pt', np.linspace(0, 100, 100, dtype=np.double))
+        self.h_sublead_el_pt     = self.make_th1('sublead_el_pt', np.linspace(0, 100, 100, dtype=np.double))
+        self.h_sublead_el_eta    = self.make_th1('sublead_el_eta', np.linspace(-2, 2, 100, dtype=np.double))
+        self.h_sublead_el_phi    = self.make_th1('sublead_el_phi', np.linspace(-4, 4, 500, dtype=np.double))
+        self.h_diel_m            = self.make_th1('diel_m', np.linspace(2, 4, 500, dtype=np.double))
+        self.h_dr                = self.make_th1('dr', np.linspace(0, 4, 100, dtype=np.double))
+        self.h_npv               = self.make_th1('npv', np.linspace(0, 80, 100, dtype=np.double))
+        self.h_diel_pt           = self.make_th1('diel_pt', np.linspace(0, 100, 500, dtype=np.double))
+        self.h2_sublead_el_pt_dr = self.make_th2('sublead_el_pt_dr', self.pt_bins,  self.dr_bins)
 
-        self.h_el_pt_trigger_or             = ROOT.TH1F('el_pt_trigger_or', 'el_pt_trigger_or', 500, 0, 100); self.addObject(self.h_el_pt_trigger_or)
-        self.h_el_eta_trigger_or            = ROOT.TH1F('el_eta_trigger_or', 'el_eta_trigger_or', 100, -2, 2); self.addObject(self.h_el_eta_trigger_or)
-        self.h_el_phi_trigger_or            = ROOT.TH1F('el_phi_trigger_or', 'el_phi_trigger_or', 100, -4, 4); self.addObject(self.h_el_phi_trigger_or)
-        self.h_sublead_el_pt_trigger_or     = ROOT.TH1F('sublead_el_pt_trigger_or', 'sublead_el_pt_trigger_or', 500, 0, 100); self.addObject(self.h_sublead_el_pt_trigger_or)
-        self.h_sublead_el_eta_trigger_or    = ROOT.TH1F('sublead_el_eta_trigger_or', 'sublead_el_eta_trigger_or', 100, -2, 2); self.addObject(self.h_sublead_el_eta_trigger_or)
-        self.h_sublead_el_phi_trigger_or    = ROOT.TH1F('sublead_el_phi_trigger_or', 'sublead_el_phi_trigger_or', 100, -4, 4); self.addObject(self.h_sublead_el_phi_trigger_or)
-        self.h_diel_m_trigger_or            = ROOT.TH1F('diel_m_trigger_or', 'diel_m_trigger_or', 100, 2, 4); self.addObject(self.h_diel_m_trigger_or)
-        self.h_dr_trigger_or                = ROOT.TH1F('dr_trigger_or', 'dr_trigger_or', 100, 0, 4); self.addObject(self.h_dr_trigger_or)
-        self.h_npv_trigger_or               = ROOT.TH1F('npv_trigger_or', 'npv_trigger_or', 80, 0, 80); self.addObject(self.h_npv_trigger_or)
-        self.h2_sublead_el_pt_dr_trigger_or = self.make_th2('sublead_el_pt_dr_trigger_or', self.pt_bins,  self.dr_bins)
+        self.h_el_pt_trig_or             = self.make_th1('el_pt_trig_or', np.linspace(0, 100, 500, dtype=np.double))
+        self.h_el_eta_trig_or            = self.make_th1('el_eta_trig_or', np.linspace(-2, 2, 100, dtype=np.double))
+        self.h_el_phi_trig_or            = self.make_th1('el_phi_trig_or', np.linspace(-4, 4, 100, dtype=np.double))
+        self.h_sublead_el_pt_trig_or     = self.make_th1('sublead_el_pt_trig_or', np.linspace(0, 100, 500, dtype=np.double))
+        self.h_sublead_el_eta_trig_or    = self.make_th1('sublead_el_eta_trig_or', np.linspace(-2, 2, 100, dtype=np.double))
+        self.h_sublead_el_phi_trig_or    = self.make_th1('sublead_el_phi_trig_or', np.linspace(-4, 4, 100, dtype=np.double))
+        self.h_diel_m_trig_or            = self.make_th1('diel_m_trig_or', np.linspace(2, 4, 100, dtype=np.double))
+        self.h_dr_trig_or                = self.make_th1('dr_trig_or', np.linspace(0, 4, 100, dtype=np.double))
+        self.h_npv_trig_or               = self.make_th1('npv_trig_or', np.linspace(0, 80, 80, dtype=np.double))
+        self.h2_sublead_el_pt_dr_trig_or = self.make_th2('sublead_el_pt_dr_trig_or', self.pt_bins,  self.dr_bins)
 
         # Trigger path PU 
         self.h_npvs =   [ self.make_th1('npv_'+str(trig), self.npv_bins) for trig in self.trigger_paths ] 
@@ -195,25 +220,29 @@ class TriggerEfficiencyProducer(Module):
             self.h_el_phi.Fill(electron.phi)
 
         if path_or:
-            self.h_sublead_el_pt_trigger_or.Fill(sublead_el_pt)
-            self.h_sublead_el_eta_trigger_or.Fill(sublead_eta)
-            self.h_sublead_el_phi_trigger_or.Fill(sublead_phi)
-            self.h_dr_trigger_or.Fill(dr)
-            self.h_diel_m_trigger_or.Fill(diel_m)
-            self.h_npv_trigger_or.Fill(npv)
-            self.h2_sublead_el_pt_dr_trigger_or.Fill(sublead_el_pt,dr)
+            self.h_sublead_el_pt_trig_or.Fill(sublead_el_pt)
+            self.h_sublead_el_eta_trig_or.Fill(sublead_eta)
+            self.h_sublead_el_phi_trig_or.Fill(sublead_phi)
+            self.h_dr_trig_or.Fill(dr)
+            self.h_diel_m_trig_or.Fill(diel_m)
+            self.h_npv_trig_or.Fill(npv)
+            self.h2_sublead_el_pt_dr_trig_or.Fill(sublead_el_pt,dr)
             for electron in electrons:
-                self.h_el_pt_trigger_or.Fill(electron.pt)
-                self.h_el_eta_trigger_or.Fill(electron.eta)
-                self.h_el_phi_trigger_or.Fill(electron.phi)
+                self.h_el_pt_trig_or.Fill(electron.pt)
+                self.h_el_eta_trig_or.Fill(electron.eta)
+                self.h_el_phi_trig_or.Fill(electron.phi)
 
         # MC Efficiencies
         if self.isMC:
-            # Assign MC events to trigger paths according to fractional Lint
-            trig_Lints = [1.5774997, 1.1357226, 0.1028168, 8.8440658, 3.3395851, 0.6748351, 6.8900702, 1.6358989, 2.6620958, 3.6112524, 2.5114598, 0.1495199, 0.6480399, 0.0413131, 0.0299539]
+            # Assign each MC event to a trigger paths according to fractional Lint
+            trig_Lints = [
+                1.577, 1.135, 0.102, 8.844, 3.339, 0.674, 6.890, 1.635,
+                2.662, 3.611, 2.511, 0.149, 0.648, 0.041, 0.029
+            ]
             trig_idx = assign_frac_trig(event._entry, trig_Lints, event._tree.GetEntries())
             idx = trig_idx + 1
-            if idx > len(trig_Lints): return True
+            if idx > len(trig_Lints):
+                return True
         
             dr_cut = dr < dr_cuts[idx]
             sublead_pt_cut = sublead_el_pt > sublead_pt_cuts[idx]
@@ -231,9 +260,9 @@ class TriggerEfficiencyProducer(Module):
             # - NPV Eff (apply pt, dr, and implicit eta cut)
             # - Di-E Pt Eff (apply pt, dr, and implicit eta cut)
             
-            # Choose 'loose' or 'tight' method for combining paths to make 'trigger_OR'
-            trigger_or_method = 'tight'
-            if 'loose' in trigger_or_method:
+            # Choose 'loose' or 'tight' method for combining paths to make 'trig_or'
+            combination_method = 'tight'
+            if 'loose' in combination_method:
                 incl_dr_cut = dr < dr_cuts[0]
                 incl_sublead_pt_cut = sublead_el_pt > sublead_pt_cuts[0]
                 incl_trig_cut = np.logical_or.reduce(trig_paths[1:trig_idx+1])
@@ -251,7 +280,7 @@ class TriggerEfficiencyProducer(Module):
                         self.h_diel_m_num_etabinned[0].Fill(diel_m,sublead_eta)
                         self.h_diel_m_num_npvbinned[0].Fill(diel_m,npv)
                         self.h_diel_m_num_dieptbinned[0].Fill(diel_m,diel_pt)
-            elif 'tight' in trigger_or_method:
+            elif 'tight' in combination_method:
                 if dr_cut:
                     self.h_diel_m_denom_ptbinned[0].Fill(diel_m,sublead_el_pt)
                     if trig_cut: self.h_diel_m_num_ptbinned[0].Fill(diel_m,sublead_el_pt)
@@ -266,7 +295,8 @@ class TriggerEfficiencyProducer(Module):
                         self.h_diel_m_num_etabinned[0].Fill(diel_m,sublead_eta)
                         self.h_diel_m_num_npvbinned[0].Fill(diel_m,npv)
                         self.h_diel_m_num_dieptbinned[0].Fill(diel_m,diel_pt)
-            else: raise KeyError('Choose Allowed Method For Combining Trigger Paths')
+            else:
+                raise KeyError('Choose Allowed Method For Combining Trigger Paths')
 
             # Individual Trigger Path Effs
             if dr_cut:
@@ -323,143 +353,64 @@ class TriggerEfficiencyProducer(Module):
 
         return True
 
+
 def worker(params):
     p = PostProcessor(
-            params['output_dir'], 
-            glob.glob(params['input_files']),
+            params.output_dir, 
+            glob.glob(params.input_files),
             cut=params['presel'],
             branchsel=None, 
-            modules=[TriggerEfficiencyProducer(trigs, isMC=False if '2022' in params['name'] else True)],
+            modules=[TriggerEfficiencyProducer(params, isMC=False if '2022' in params.name else True)],
             noOut=True,
-            histFileName=params['output_dir']+'/'+params['output_filename'],
-            histDirName='plots',
-            jsonInput=params['json'],
+            histDirName=params.output_dir,
+            histFileName=str(params.output_file),
+            jsonInput=params.json,
     )
     p.run()
 
-if __name__=='__main__':
-    input_config = [
-        # {'name' : 'Test',
-        #  'input_files' : '/eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022E/Preselection/output_22*_*_skim.root',
-        #  'output_dir'  : '/afs/cern.ch/work/n/nzipper/public/Rk/TriggerEfficiencies/NanoAODTools/root_output/test',
-        #  'json_path'   : '/afs/cern.ch/work/n/nzipper/public/Rk/Files/JSON/Eras_CDEFG',
-        #  'presel'      : None,
-        # },
-        # {'name'        : 'BuToKee',
-        #  'input_files' : '', 
-        #  'output_dir'  : '/afs/cern.ch/work/n/nzipper/public/Rk/TriggerEfficiencies/NanoAODTools/root_output/BuToKee',
-        #  'json_path'   : None,
-        #  'presel'      : None,
-        # },
-        # {'name'        : 'BuToKJpsi_Toee_baseline_Tight',
-        #  'input_files' : '/eos/cms/store/group/phys_bphys/DiElectronX/nzipper/BuTOjpsiKEESkims/*.root', 
-        #  'output_dir'  : '/afs/cern.ch/work/n/nzipper/public/Rk/TriggerEfficiencies/NanoAODTools/root_output/mc/BuToKJpsi_Toee',
-        #  'json_path'   : None,
-        #  'presel'      : None,
-        # },
-        # {'name'        : '2022C',
-        #  'input_files' : '/eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022C/Preselection/*.root',
-        #  'output_dir'  : '/afs/cern.ch/work/n/nzipper/public/Rk/TriggerEfficiencies/NanoAODTools/root_output/data/data_baseline_excl',
-        #  'json_path'   : '/afs/cern.ch/work/n/nzipper/public/Rk/Files/JSON/Eras_CDEFG',
-        #  'presel'      : None,
-        # },
-        # {'name'        : '2022D',
-        #  'input_files' : '/eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022D/Preselection/*.root',
-        #  'output_dir'  : '/afs/cern.ch/work/n/nzipper/public/Rk/TriggerEfficiencies/NanoAODTools/root_output/data/data_baseline_excl',
-        #  'json_path'   : '/afs/cern.ch/work/n/nzipper/public/Rk/Files/JSON/Eras_CDEFG',
-        #  'presel'      : None,
-        # },
-        # {'name'        : '2022E',
-        #  'input_files' : '/eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022E/Preselection/*.root',
-        #  'output_dir'  : '/afs/cern.ch/work/n/nzipper/public/Rk/TriggerEfficiencies/NanoAODTools/root_output/data/data_baseline_excl',
-        #  'json_path'   : '/afs/cern.ch/work/n/nzipper/public/Rk/Files/JSON/Eras_CDEFG',
-        #  'presel'      : None,
-        # },
-        {'name'        : '2022F',
-         'input_files' : '/eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022F/Preselection/*.root',
-         'output_dir'  : '/afs/cern.ch/work/n/nzipper/public/Rk/TriggerEfficiencies/NanoAODTools/root_output/data/data_baseline_excl',
-         'json_path'   : '/afs/cern.ch/work/n/nzipper/public/Rk/Files/JSON/Eras_CDEFG',
-         'presel'      : None,
-        },
-        # {'name'        : '2022G',
-        #  'input_files' : '/eos/cms/store/group/phys_bphys/DiElectronX/nzipper/ParkingDoubleMuonLowMassSkims/2022G/Preselection/*.root',
-        #  'output_dir'  : '/afs/cern.ch/work/n/nzipper/public/Rk/TriggerEfficiencies/NanoAODTools/root_output/data/data_baseline_excl',
-        #  'json_path'   : '/afs/cern.ch/work/n/nzipper/public/Rk/Files/JSON/Eras_CDEFG',
-        #  'presel'      : None,
-        # },
-    ]
 
-    trigs = [
-        'trigger_OR',
-        # 'L1_11p0_HLT_6p5_Incl_Final',
-        # 'L1_10p5_HLT_6p5_Incl_Final',
-        # 'L1_10p5_HLT_5p0_Incl_Final',
-        # 'L1_9p0_HLT_6p0_Incl_Final',
-        # 'L1_8p5_HLT_5p5_Incl_Final',
-        # 'L1_8p5_HLT_5p0_Incl_Final',
-        # 'L1_8p0_HLT_5p0_Incl_Final',
-        # 'L1_7p5_HLT_5p0_Incl_Final',
-        # 'L1_7p0_HLT_5p0_Incl_Final',
-        # 'L1_6p5_HLT_4p5_Incl_Final',
-        # 'L1_6p0_HLT_4p0_Incl_Final',
-        # 'L1_5p5_HLT_6p0_Incl_Final',
-        # 'L1_5p5_HLT_4p0_Incl_Final',
-        # 'L1_5p0_HLT_4p0_Incl_Final',
-        # 'L1_4p5_HLT_4p0_Incl_Final',
-        'L1_11p0_HLT_6p5_Excl_Final',
-        'L1_10p5_HLT_6p5_Excl_Final',
-        'L1_10p5_HLT_5p0_Excl_Final',
-        'L1_9p0_HLT_6p0_Excl_Final',
-        'L1_8p5_HLT_5p5_Excl_Final',
-        'L1_8p5_HLT_5p0_Excl_Final',
-        'L1_8p0_HLT_5p0_Excl_Final',
-        'L1_7p5_HLT_5p0_Excl_Final',
-        'L1_7p0_HLT_5p0_Excl_Final',
-        'L1_6p5_HLT_4p5_Excl_Final',
-        'L1_6p0_HLT_4p0_Excl_Final',
-        'L1_5p5_HLT_6p0_Excl_Final',
-        'L1_5p5_HLT_4p0_Excl_Final',
-        'L1_5p0_HLT_4p0_Excl_Final',
-        'L1_4p5_HLT_4p0_Excl_Final',
-        ]
-
-    runStrategy = 'mp'
-    if 'mp' in runStrategy:
+def main(cfg):
+    if 'mp' in cfg.run_strategy:
         start_time = time.perf_counter()
-        jobs = []
-        for params in input_config:
-            os.makedirs(params['output_dir'], exist_ok=True)
-            if params['json_path']: 
-                for trig in trigs:
-                    params['json'] = ''.join([params['json_path'], '/', trig, '.json'])
-                    params['output_filename'] = ''.join(['Efficiencies_', params['name'], '_', trig, '.root'])
-                    pool = multiprocessing.Pool()
-                    proc = multiprocessing.Process(target=worker, args=(params, ))
-                    jobs.append(proc)
-                    proc.start()
-            else:
-                params['json'] = None
-                params['output_filename'] = ''.join(['Efficiencies_', params['name'], '.root'])
-                pool = multiprocessing.Pool()
-                proc = multiprocessing.Process(target=worker, args=(params, ))
-                jobs.append(proc)
-                proc.start()
-
-        for p in jobs:
-            p.join()
+        
+        with mp.Pool() as pool:
+            for job in cfg.jobs:
+                job = DotDict(job)
+                job.triggers = cfg.triggers
+                os.makedirs(job.output_dir, exist_ok=True)
+                for trigger in cfg.triggers:
+                    job.json = Path(job.json_dir) / f'{trigger}.json' if job.json_dir else None
+                    job.output_file = Path(job.output_dir) / (f'effs_{job.name}_{trigger}.root' if job.json_dir else f'effs_{job.name}.root')
+                    
+                    pool.apply_async(worker, args=(job,))
+            
+            pool.close()
+            pool.join()
 
         finish_time = time.perf_counter()
-        print(''.join(['Finished in ', str(finish_time-start_time), ' seconds']))
+        print(f'Finished in {finish_time - start_time} seconds')
 
     else:
-        for params in input_config:
-            os.makedirs(params['output_dir'], exist_ok=True)
-            if params['json_path']: 
-                for trig in trigs:
-                    params['json'] = ''.join([params['json_path'], '/', trig, '.json'])
-                    params['output_filename'] = ''.join(['Efficiencies_', params['name'], '_', trig, '.root'])
-                    worker(params)
-            else:
-                params['json'] = None
-                params['output_filename'] = ''.join(['Efficiencies_', params['name'], '.root'])
-                worker(params)
+        start_time = time.perf_counter()
+        for job in cfg.jobs:
+            job = DotDict(job)
+            job.triggers = cfg.triggers
+            os.makedirs(job.output_dir, exist_ok=True)
+            for trigger in cfg.triggers:
+                job.json = Path(job.json_dir) / f'{trigger}.json' if job.json_dir else None
+                job.output_file = Path(job.output_dir) / (f'effs_{job.name}_{trigger}.root' if job.json_dir else f'effs_{job.name}.root')
+                worker(job)
+
+        finish_time = time.perf_counter()
+        print(f'Finished in {finish_time - start_time} seconds')
+
+if __name__=='__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--config', dest='config', type=str, default='skim_cfg.yml', help='skim configuration file (.yml)')
+    parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help='printouts to stdout')
+    args = parser.parse_args()
+
+    with open(args.config, 'r') as f:
+        cfg = DotDict(yaml.safe_load(f))
+
+    main(cfg)

@@ -1,3 +1,4 @@
+import os
 import multiprocessing as mp
 import argparse
 import time
@@ -57,7 +58,7 @@ def main(args):
                 for idx, files in enumerate(params['files']):
                     job_dict = {}
                     job_dict['json'] = None
-                    job_dict['output_path'] = ''.join([params['output_path'] , '/Preselection'])
+                    job_dict['output_path'] = os.path.join([params['output_path'] , 'skims_local'])
                     job_dict['files'] = files
                     job_dict['preselection'] = params['preselection']
                     job_dict['idx'] = idx
@@ -65,7 +66,7 @@ def main(args):
             else:
                 job_dict = {}
                 job_dict['json'] = None
-                job_dict['output_path'] = ''.join([params['output_path'] , '/Preselection'])
+                job_dict['output_path'] = os.path.join([params['output_path'] , 'skims_local'])
                 job_dict['files'] = params['files']
                 job_dict['preselection'] = params['preselection']
                 job_dict['idx'] = 0
