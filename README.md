@@ -4,7 +4,6 @@
 
 ### Building Environment (First-Time Setup)
 ```
-cmssw-el7
 cmsrel CMSSW_14_0_6
 cd CMSSW_14_0_6/src
 cmsenv
