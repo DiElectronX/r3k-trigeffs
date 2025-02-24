@@ -20,31 +20,4 @@ cmsenv
 
 ## Orthogonal Dataset Method (Double-Muon Trigger) [WIP porting code to Git]
 
-### Skimming NanoAOD files
-
-For ease of use, loose pre-selection cuts are applied to slim data size and allow interactive production of trigger efficiency results.
-
-```
-python skim_nanoaod.py [-d <list of datasets in cfg file to run over. Default is everything>] [-v]
-```
-
-### Calculating Efficiencies
-
-The code builds histograms containing the events in the numerator and denominator of relevant efficiency plots.
-
-```
-python calculate_efficiencies.py
-```
-
-### Plotting Efficiencies
-
-Code is broken now but it shows the process of how the efficiency plots are calculated. Will fix soon.
-
-
-This code reads the histograms from the previous step, performs a simplified fit of the J/Psi peak to obtain a signal yield, and uses the yields to generate trigger efficiency plots.
-
-```
-python plot_efficiencies.py
-```
-
-
+Will update with full procedure soon
