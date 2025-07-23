@@ -88,29 +88,29 @@ class TriggerEfficiencyProducer(Module):
             l1_dict = {k: v for k, v in trigger_dict.items() if 'L1_' in k}
             lumi_tot = sum(v['lint'] for v in l1_dict.values())
 
-            if '_OR' in self.trigger:
-                pass_l1_dict = {k: v for k, v in l1_dict.items() if v.get('pass')}
-                if pass_l1_dict:
-                    # v1 method
-                    lumi_trig = sum(v['lint'] for v in pass_l1_dict.values())
+            # if '_OR' in self.trigger:
+            pass_l1_dict = {k: v for k, v in l1_dict.items() if v.get('pass')}
+            if pass_l1_dict:
+                # v1 method
+                lumi_trig = sum(v['lint'] for v in pass_l1_dict.values())
 
-                    # v2 method
-                    # lowest_trigger = min(pass_l1_dict, key=lambda k: _extract_numbers(k))
-                    # lumi_trig = l1_dict[lowest_trigger]['lint']
+                # v2 method
+                # lowest_trigger = min(pass_l1_dict, key=lambda k: _extract_numbers(k))
+                # lumi_trig = l1_dict[lowest_trigger]['lint']
 
-                    wgt = lumi_trig / lumi_tot
-                else:
-                    wgt = 0
-
-            elif 'L1_' in self.trigger:
-                trigger_values = trigger_dict.get(self.trigger, {})
-                if lumi_tot > 0:
-                    wgt = (trigger_values.get('lint', 0) / lumi_tot) if trigger_values.get('pass') else 0
-                else:
-                    wgt = 0
-
+                wgt = lumi_trig / lumi_tot
             else:
-                raise KeyError('Non-valid trigger set in configuration file')
+                wgt = 0
+
+            # elif 'L1_' in self.trigger:
+            #     trigger_values = trigger_dict.get(self.trigger, {})
+            #     if lumi_tot > 0:
+            #         wgt = (trigger_values.get('lint', 0) / lumi_tot) if trigger_values.get('pass') else 0
+            #     else:
+            #         wgt = 0
+
+            # else:
+            #     raise KeyError('Non-valid trigger set in configuration file')
         else:
             wgt = 1
 
@@ -152,12 +152,12 @@ class TriggerEfficiencyProducer(Module):
         self.h_el_phi            = self.make_th1('el_phi', np.linspace(-4, 4, 100, dtype=np.double))
         self.h_lead_el_pt        = self.make_th1('lead_el_pt', np.linspace(0, 100, 100, dtype=np.double))
         self.h_sublead_el_pt     = self.make_th1('sublead_el_pt', np.linspace(0, 100, 100, dtype=np.double))
+        self.h_diel_pt           = self.make_th1('diel_pt', np.linspace(0, 100, 100, dtype=np.double))
         self.h_sublead_el_eta    = self.make_th1('sublead_el_eta', np.linspace(-2, 2, 100, dtype=np.double))
         self.h_sublead_el_phi    = self.make_th1('sublead_el_phi', np.linspace(-4, 4, 500, dtype=np.double))
         self.h_diel_m            = self.make_th1('diel_m', np.linspace(2, 4, 500, dtype=np.double))
         self.h_dr                = self.make_th1('dr', np.linspace(0, 4, 100, dtype=np.double))
         self.h_npv               = self.make_th1('npv', np.linspace(0, 80, 100, dtype=np.double))
-        self.h_diel_pt           = self.make_th1('diel_pt', np.linspace(0, 100, 500, dtype=np.double))
         self.h_sublead_el_pt_dr  = self.make_th2('sublead_el_pt_dr', self.pt_bins,  self.dr_bins)
 
         # Trigger path PU
@@ -193,27 +193,27 @@ class TriggerEfficiencyProducer(Module):
 
         # Define Trigger Paths
         trigger_dict = {
-            'L1_11p0_HLT_6p5_Excl' : trig_L1.DoubleEG11_er1p2_dR_Max0p6   and trig_HLT.DoubleEle6p5_eta1p22_mMax6,
-            'L1_10p5_HLT_6p5_Excl' : trig_L1.DoubleEG10p5_er1p2_dR_Max0p6 and trig_HLT.DoubleEle6p5_eta1p22_mMax6,
-            'L1_10p5_HLT_5p0_Excl' : trig_L1.DoubleEG10p5_er1p2_dR_Max0p6 and trig_HLT.DoubleEle5_eta1p22_mMax6,
-            'L1_9p0_HLT_6p0_Excl'  : trig_L1.DoubleEG9_er1p2_dR_Max0p7    and trig_HLT.DoubleEle6_eta1p22_mMax6,
-            'L1_8p5_HLT_5p5_Excl'  : trig_L1.DoubleEG8p5_er1p2_dR_Max0p7  and trig_HLT.DoubleEle5p5_eta1p22_mMax6,
-            'L1_8p5_HLT_5p0_Excl'  : trig_L1.DoubleEG8p5_er1p2_dR_Max0p7  and trig_HLT.DoubleEle5_eta1p22_mMax6,
-            'L1_8p0_HLT_5p0_Excl'  : trig_L1.DoubleEG8_er1p2_dR_Max0p7    and trig_HLT.DoubleEle5_eta1p22_mMax6,
-            'L1_7p5_HLT_5p0_Excl'  : trig_L1.DoubleEG7p5_er1p2_dR_Max0p7  and trig_HLT.DoubleEle5_eta1p22_mMax6,
-            'L1_7p0_HLT_5p0_Excl'  : trig_L1.DoubleEG7_er1p2_dR_Max0p8    and trig_HLT.DoubleEle5_eta1p22_mMax6,
-            'L1_6p5_HLT_4p5_Excl'  : trig_L1.DoubleEG6p5_er1p2_dR_Max0p8  and trig_HLT.DoubleEle4p5_eta1p22_mMax6,
-            'L1_6p0_HLT_4p0_Excl'  : trig_L1.DoubleEG6_er1p2_dR_Max0p8    and trig_HLT.DoubleEle4_eta1p22_mMax6,
-            'L1_5p5_HLT_6p0_Excl'  : trig_L1.DoubleEG5p5_er1p2_dR_Max0p8  and trig_HLT.DoubleEle6_eta1p22_mMax6,
-            'L1_5p5_HLT_4p0_Excl'  : trig_L1.DoubleEG5p5_er1p2_dR_Max0p8  and trig_HLT.DoubleEle4_eta1p22_mMax6,
-            'L1_5p0_HLT_4p0_Excl'  : trig_L1.DoubleEG5_er1p2_dR_Max0p9    and trig_HLT.DoubleEle4_eta1p22_mMax6,
-            'L1_4p5_HLT_4p0_Excl'  : trig_L1.DoubleEG4p5_er1p2_dR_Max0p9  and trig_HLT.DoubleEle4_eta1p22_mMax6,
+            'L1_11p0_HLT_6p5_Incl' : trig_L1.DoubleEG11_er1p2_dR_Max0p6   and trig_HLT.DoubleEle6p5_eta1p22_mMax6,
+            'L1_10p5_HLT_6p5_Incl' : trig_L1.DoubleEG10p5_er1p2_dR_Max0p6 and trig_HLT.DoubleEle6p5_eta1p22_mMax6,
+            'L1_10p5_HLT_5p0_Incl' : trig_L1.DoubleEG10p5_er1p2_dR_Max0p6 and trig_HLT.DoubleEle5_eta1p22_mMax6,
+            'L1_9p0_HLT_6p0_Incl'  : trig_L1.DoubleEG9_er1p2_dR_Max0p7    and trig_HLT.DoubleEle6_eta1p22_mMax6,
+            'L1_8p5_HLT_5p5_Incl'  : trig_L1.DoubleEG8p5_er1p2_dR_Max0p7  and trig_HLT.DoubleEle5p5_eta1p22_mMax6,
+            'L1_8p5_HLT_5p0_Incl'  : trig_L1.DoubleEG8p5_er1p2_dR_Max0p7  and trig_HLT.DoubleEle5_eta1p22_mMax6,
+            'L1_8p0_HLT_5p0_Incl'  : trig_L1.DoubleEG8_er1p2_dR_Max0p7    and trig_HLT.DoubleEle5_eta1p22_mMax6,
+            'L1_7p5_HLT_5p0_Incl'  : trig_L1.DoubleEG7p5_er1p2_dR_Max0p7  and trig_HLT.DoubleEle5_eta1p22_mMax6,
+            'L1_7p0_HLT_5p0_Incl'  : trig_L1.DoubleEG7_er1p2_dR_Max0p8    and trig_HLT.DoubleEle5_eta1p22_mMax6,
+            'L1_6p5_HLT_4p5_Incl'  : trig_L1.DoubleEG6p5_er1p2_dR_Max0p8  and trig_HLT.DoubleEle4p5_eta1p22_mMax6,
+            'L1_6p0_HLT_4p0_Incl'  : trig_L1.DoubleEG6_er1p2_dR_Max0p8    and trig_HLT.DoubleEle4_eta1p22_mMax6,
+            'L1_5p5_HLT_6p0_Incl'  : trig_L1.DoubleEG5p5_er1p2_dR_Max0p8  and trig_HLT.DoubleEle6_eta1p22_mMax6,
+            'L1_5p5_HLT_4p0_Incl'  : trig_L1.DoubleEG5p5_er1p2_dR_Max0p8  and trig_HLT.DoubleEle4_eta1p22_mMax6,
+            'L1_5p0_HLT_4p0_Incl'  : trig_L1.DoubleEG5_er1p2_dR_Max0p9    and trig_HLT.DoubleEle4_eta1p22_mMax6,
+            'L1_4p5_HLT_4p0_Incl'  : trig_L1.DoubleEG4p5_er1p2_dR_Max0p9  and trig_HLT.DoubleEle4_eta1p22_mMax6,
         }
         trigger_dict['trigger_OR'] = any(i for i in trigger_dict.values())
         trigger_dict = {k: {**v, 'pass': trigger_dict[k] if k in trigger_dict else False} for k, v in self.triggers.items()}
-
         # Cuts & weights corresponding to each trigger path
         wgt, pt_cut, dr_cut = self.get_trigger_values(trigger_dict)
+        wgt = 1.
 
         # Define Kinematic Variables
         lead_el_pt    = electrons[0].pt
@@ -228,6 +228,11 @@ class TriggerEfficiencyProducer(Module):
         trigger_pass = trigger_dict[self.trigger]['pass']
         pt_pass      = sublead_el_pt >= pt_cut
         dr_pass      = dr <= dr_cut
+
+
+        # if dr<0.2 or dr>0.3:
+        #     return True
+
 
         # Fill Kinematic Plots
         self.fill_th1(self.h_lead_el_pt, lead_el_pt, wgt)

@@ -231,7 +231,7 @@ class DotDict(dict):
 
 def make_plotlist(cfg):
     plots = []
-    out_path = Path(cfg.output.output_dir) / 'test' if cfg.test else Path(cfg.output.output_dir)
+    out_path = Path('./eff_hists/test') if cfg.test else Path(cfg.output.output_dir)
     data_in_path = Path(cfg.inputs.data_dir).parent / 'test' if cfg.test else Path(cfg.inputs.data_dir)
     mc_in_path = Path(cfg.inputs.mc_dir).parent / 'test' if cfg.test else Path(cfg.inputs.mc_dir)
     for plot_name, plot_dict in cfg.plots.items():
@@ -294,7 +294,7 @@ def make_eff_plot_dict(cfg):
         }
 
         data_hists, mc_hists = get_hists(plot_cfg)
-        fit_output_file = (plot_cfg.output_file.parent / 'fits') / plot_cfg.output_file.name
+        fit_output_file = plot_cfg.output_file.parent / 'fits' / plot_cfg.output_file.name
         for i, ((data_num_hist, data_denom_hist), (mc_num_hist, mc_denom_hist)) in enumerate(zip(data_hists, mc_hists)):
             n_num_mc, n_num_mc_err, sig_params = do_fit(
                 mc_num_hist, 
@@ -354,6 +354,12 @@ def plot_efficiencies(eff_dicts, test=False):
         h_num_mc = ROOT.TH1F('h_num_mc', 'h_num_mc', len(bins)-1, bins)
         h_denom_mc = ROOT.TH1F('h_denom_mc', 'h_denom_mc', len(bins)-1, bins)
 
+
+        h_num_data_count = ufloat(0,0)
+        h_denom_data_count = ufloat(0,0)
+        h_num_mc_count = ufloat(0,0)
+        h_denom_mc_count = ufloat(0,0)
+
         zipped_yields = zip(
             d['data_num_yields'],
             d['data_denom_yields'],
@@ -373,7 +379,18 @@ def plot_efficiencies(eff_dicts, test=False):
             h_denom_mc.SetBinContent(ibin+1, mc_denom[0])
             h_denom_mc.SetBinError(ibin+1, mc_denom[1])
 
+            h_num_data_count += ufloat(*data_num)
+            h_denom_data_count += ufloat(*data_denom)
+            h_num_mc_count += ufloat(*mc_num)
+            h_denom_mc_count += ufloat(*mc_denom)
         
+        data_incl_eff = h_num_data_count / h_denom_data_count
+        mc_incl_eff = h_num_mc_count / h_denom_mc_count
+        # print(d['name'])
+        # print(f'Inclusive Data Eff. = {data_incl_eff}')
+        # print(f'Inclusive MC Eff. = {mc_incl_eff}')
+        # print(f'Data/MC Eff Ratio = {data_incl_eff / mc_incl_eff}')
+
         eff_data = ROOT.TEfficiency(h_num_data, h_denom_data)
         eff_data.SetStatisticOption(ROOT.TEfficiency.kBBayesian)
 
@@ -400,11 +417,14 @@ def plot_efficiencies(eff_dicts, test=False):
         )
 
 
-def make_sf_json(eff_dicts):
+def make_sf_json(cfg, eff_dicts):
+    pprint(eff_dicts)
     outputs = {}
     for eff_dict in eff_dicts:
-        binvar_match = re.search(r'(?<=_)([a-zA-Z]*pt)(?=binned(?:_|$))', eff_dict['name'])
-        binvar = binvar_match.group(1)
+        matches = list(re.finditer(r'_([^_]+)binned(?=_|$)', eff_dict['name']))
+        if not matches:
+            raise ValueError(f"Could not find binvar in {eff_dict['name']}")
+        binvar = matches[-1].group(1)
 
         data_num = [ufloat(val, unc) for val, unc in eff_dict['data_num_yields']]
         data_denom = [ufloat(val, unc) for val, unc in eff_dict['data_denom_yields']]
@@ -415,20 +435,30 @@ def make_sf_json(eff_dicts):
         mc_ratio = [n / d if d.n != 0 else ufloat(0, 0) for n, d in zip(mc_num, mc_denom)]
 
         sfs = [d / m if m.n != 0 else ufloat(0, 0) for d, m in zip(data_ratio, mc_ratio)]
+
         sfs = [(round(r.n,3), round(r.s,3)) for r in sfs]
+        data_ratio = [(round(r.n,3), round(r.s,3)) for r in data_ratio]
+        mc_ratio = [(round(r.n,3), round(r.s,3)) for r in mc_ratio]
 
         output = {
-            eff_dict['trigger'] : {
-                binvar : list(eff_dict['bins'])[:-1],
-                'sfs'  : sfs,
-            }
+            'binvar'    : binvar,
+            'bins'      : list(eff_dict['bins'])[:-1],
+            'sfs'       : sfs,
+            'data_effs' : data_ratio,
+            'mc_effs'   : mc_ratio,
         }
 
-        outputs[binvar] = copy.deepcopy(output)
+        if eff_dict['trigger'] not in outputs:
+            outputs[eff_dict['trigger']] = [copy.deepcopy(output)]
+        else:
+            outputs[eff_dict['trigger']].append(copy.deepcopy(output))
 
-    for var, output_dict in outputs.items():
-        with open(f'sf_jsons/trigger_sfs_{var}binned.json', 'w') as outfile:
-            json.dump(output_dict, outfile, indent=4)
+        # outputs[eff_dict['trigger']] = copy.deepcopy(output)
+    pprint(outputs)
+
+    out_path = Path('eff_hists') / 'test' if cfg.test else Path(cfg.output.output_dir)
+    with open(out_path / 'sf_jsons' / 'trigger_sfs.json', 'w') as outfile:
+        json.dump(outputs, outfile, indent=4)
 
 def main(cfg):
     cfg = DotDict(cfg)
@@ -442,7 +472,7 @@ def main(cfg):
         raise ValueError(f'Efficiency dict file {str(cfg.file)} is not readable')
 
     plot_efficiencies(eff_dicts, test=cfg.test)
-    make_sf_json(eff_dicts)
+    make_sf_json(cfg, eff_dicts)
 
 
 if __name__=='__main__':
@@ -457,6 +487,8 @@ if __name__=='__main__':
         cfg = DotDict(yaml.safe_load(f))
 
     os.makedirs(Path(cfg.output.output_dir), exist_ok=True)
+    os.makedirs(Path(cfg.output.output_dir) / 'fits', exist_ok=True)
+    os.makedirs(Path(cfg.output.output_dir) / 'sf_jsons', exist_ok=True)
     cfg.test = args.test
     cfg.verbose = args.verbose
     cfg.printlevel = set_verbosity(args.verbose)
