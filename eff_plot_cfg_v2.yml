@@ -1,0 +1,21 @@
+inputs:
+  data_dir: eff_hists/2_21_25/
+  mc_dir: mc_eff_hists_v2/
+  hist_dir: hists/
+
+output:
+  output_dir: eff_plots_v2/
+
+plots:
+  trigger_OR_test:
+    files:
+      data: effs_data_trigger_OR_test.root
+      mc: effs_jpsi_trigger_OR_test_trigger_OR.root
+    triggers: [trigger_OR]
+    variables: [pt,dr]
+  trigger_OR:
+    files:
+      data: effs_data_trigger_OR.root
+      mc: effs_jpsi_resonant_trigger_OR.root
+    triggers: [trigger_OR]
+    variables: [pt]
