@@ -125,7 +125,7 @@ class MCTriggerEfficiencyProducer(Module):
         # Hist Binnings
         self.diel_m_bins = np.linspace(2, 4, 100, dtype=np.double)
         # self.pt_bins     = np.array([5, 8, 11, 999], dtype=np.double)
-        self.pt_bins     = np.array([5, 6, 7, 8, 9, 10, 11, 12, 13, 999], dtype=np.double)
+        self.pt_bins     = np.array([5, 7, 9, 10, 11, 12, 13, 999], dtype=np.double)
         self.dr_bins     = np.array([0, 0.12, 0.2, 0.28, 0.44, 1.], dtype=np.double)
         self.npv_bins    = np.linspace(0, 100, 100, dtype=np.double)
 

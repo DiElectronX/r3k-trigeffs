@@ -1,0 +1,32 @@
+global_cfg:
+  run_strategy: serial
+  output_dir: /eos/cms/store/group/phys_bphys/DiElectronX/jfratice/r3k-analysis/output/r3k-trigeff/TriggerEffHists/2022_trigger_OR/run4/data
+  theory_weights_file: fonll_weights.json
+  test: false
+
+trigger_map:
+  L1_11p0_HLT_6p5: ['DoubleEG11_er1p2_dR_Max0p6', 'DoubleEle6p5_eta1p22_mMax6']
+  L1_10p5_HLT_6p5: ['DoubleEG10p5_er1p2_dR_Max0p6', 'DoubleEle6p5_eta1p22_mMax6']
+  L1_10p5_HLT_5p0: ['DoubleEG10p5_er1p2_dR_Max0p6', 'DoubleEle5_eta1p22_mMax6']
+  L1_9p0_HLT_6p0:  ['DoubleEG9_er1p2_dR_Max0p7',   'DoubleEle6_eta1p22_mMax6']
+  L1_8p5_HLT_5p5:  ['DoubleEG8p5_er1p2_dR_Max0p7', 'DoubleEle5p5_eta1p22_mMax6']
+  L1_8p5_HLT_5p0:  ['DoubleEG8p5_er1p2_dR_Max0p7', 'DoubleEle5_eta1p22_mMax6']
+  L1_8p0_HLT_5p0:  ['DoubleEG8_er1p2_dR_Max0p7',   'DoubleEle5_eta1p22_mMax6']
+  L1_7p5_HLT_5p0:  ['DoubleEG7p5_er1p2_dR_Max0p7', 'DoubleEle5_eta1p22_mMax6']
+  L1_7p0_HLT_5p0:  ['DoubleEG7_er1p2_dR_Max0p8',   'DoubleEle5_eta1p22_mMax6']
+  L1_6p5_HLT_4p5:  ['DoubleEG6p5_er1p2_dR_Max0p8', 'DoubleEle4p5_eta1p22_mMax6']
+  L1_6p0_HLT_4p0:  ['DoubleEG6_er1p2_dR_Max0p8',   'DoubleEle4_eta1p22_mMax6']
+  L1_5p5_HLT_6p0:  ['DoubleEG5p5_er1p2_dR_Max0p8', 'DoubleEle6_eta1p22_mMax6']
+  L1_5p5_HLT_4p0:  ['DoubleEG5p5_er1p2_dR_Max0p8', 'DoubleEle4_eta1p22_mMax6']
+  L1_5p0_HLT_4p0:  ['DoubleEG5_er1p2_dR_Max0p9',   'DoubleEle4_eta1p22_mMax6']
+  L1_4p5_HLT_4p0:  ['DoubleEG4p5_er1p2_dR_Max0p9', 'DoubleEle4_eta1p22_mMax6']
+
+data_samples:
+  - name: data_2022_trigger_OR
+    inputs: /eos/cms/store/group/phys_bphys/DiElectronX/jfratice/r3k-analysis/output/r3k-trigeff/TriggerEffSkims/2022_trigger_OR/run2/data/
+    presel: null
+
+mc_samples:
+  - name: mc_jpsi_resonant
+    inputs: /eos/cms/store/group/phys_bphys/DiElectronX/jfratice/r3k-analysis/output/r3k-trigeff/TriggerEffSkims/2022_trigger_OR/run2/mc/
+    presel: null

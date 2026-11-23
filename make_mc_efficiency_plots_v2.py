@@ -95,7 +95,7 @@ def estimateBins(h,nbins=5):
 def assign_hist_format(h_name):
     if 'ptbinned' in h_name:
         h_format = {
-            'bins' : np.array([5, 6, 7, 8, 9, 10, 11, 12, 13, 20], dtype=np.double),
+            'bins' : np.array([5, 7, 9, 10, 11, 12, 13, 999], dtype=np.double),
             # 'bins' : np.array([5, 8, 11, 20], dtype=np.double),
             'xlabel' : 'Sublead Electron p_{T} [GeV]',
         }
@@ -117,21 +117,46 @@ def assign_hist_format(h_name):
 
 def do_fit(h, signal_only=False, savename=None, get_params=False, signal_params=None, bkg_shape_deg=4, printlevel=ROOT.RooFit.PrintLevel(-1), chi2_threshold=15.0, max_tries=20):
 
-    data_yield = h.GetEntries()
+    #data_yield = h.GetEntries()
+    #data_min = h.GetXaxis().GetXmin()
+    #data_max = h.GetXaxis().GetXmax()
+
+    #mass = ROOT.RooRealVar('mass', 'mass', 2.5, 3.4)
+    #data = ROOT.RooDataHist('data', 'data', mass, h)
+
+    #sig_coeff =  ROOT.RooRealVar('sig_coeff', 'sig_coeff', data_yield*.03, 0, data_yield)
+
     data_min = h.GetXaxis().GetXmin()
     data_max = h.GetXaxis().GetXmax()
 
     mass = ROOT.RooRealVar('mass', 'mass', 2.5, 3.4)
     data = ROOT.RooDataHist('data', 'data', mass, h)
 
-    sig_coeff =  ROOT.RooRealVar('sig_coeff', 'sig_coeff', data_yield*.03, 0, data_yield)
+    # Use the actual fitted histogram content scale, not GetEntries().
+    lo_bin = h.GetXaxis().FindBin(2.5 + 1e-6)
+    hi_bin = h.GetXaxis().FindBin(3.4 - 1e-6)
+    data_yield = max(float(h.Integral(lo_bin, hi_bin)), 1.0)
+
+    # Crude but more stable signal-yield seed from the J/psi window.
+    peak_lo = h.GetXaxis().FindBin(2.95)
+    peak_hi = h.GetXaxis().FindBin(3.20)
+    peak_yield = max(float(h.Integral(peak_lo, peak_hi)), 1.0)
+
+    sig_start = min(max(0.25 * peak_yield, 0.02 * data_yield), 0.8 * data_yield)
+    bkg_start = max(data_yield - sig_start, 0.01 * data_yield)
+
+    yield_max = 1.5 * data_yield
+
+    sig_coeff = ROOT.RooRealVar('sig_coeff', 'sig_coeff', sig_start, 0, yield_max)
+
     cb_mean =   ROOT.RooRealVar('cb_mean', 'cb_mean', 3.0969)
     cb_sigma =  ROOT.RooRealVar('cb_sigma', 'cb_sigma', 0.046, 0.02, 0.1)
     cb_alpha = ROOT.RooRealVar('cb_alpha', 'cb_alpha', 2.0, 0.3, 10.)
     cb_n =     ROOT.RooRealVar('cb_n', 'cb_n', 8.0, 1.01, 40.)
     sig_pdf = ROOT.RooCrystalBall('sig_pdf', 'Signal Fit', mass, cb_mean, cb_sigma, cb_alpha, cb_n)
 
-    bkg_coeff =  ROOT.RooRealVar('bkg_coeff', 'bkg_coeff', data_yield*.97, 0, data_yield)
+    #bkg_coeff =  ROOT.RooRealVar('bkg_coeff', 'bkg_coeff', data_yield*.97, 0, data_yield)
+    bkg_coeff = ROOT.RooRealVar('bkg_coeff', 'bkg_coeff', bkg_start, 0, yield_max)
     bern_pars = [ROOT.RooRealVar(f'bern_p{i}', f'bern_p{i}', 1, 0, 10) for i in range(bkg_shape_deg)]
     bkg_pdf = ROOT.RooBernstein('bkg_pdf', 'Background Fit', mass, ROOT.RooArgList(*bern_pars))
 
@@ -159,17 +184,43 @@ def do_fit(h, signal_only=False, savename=None, get_params=False, signal_params=
         if fit_result:
             fit_result.Delete()
 
+        #fit_result = fit_model.fitTo(
+        #    data,
+        #    ROOT.RooFit.Save(True),
+        #    ROOT.RooFit.Minos(True),
+        #    ROOT.RooFit.ExternalConstraints(ROOT.RooArgSet(n_constraint_pdf)),
+        #    printlevel
+        #)
+
         fit_result = fit_model.fitTo(
             data,
             ROOT.RooFit.Save(True),
-            ROOT.RooFit.Minos(True),
+            ROOT.RooFit.Minos(False),
+            ROOT.RooFit.Hesse(True),
+            ROOT.RooFit.Strategy(2),
             ROOT.RooFit.ExternalConstraints(ROOT.RooArgSet(n_constraint_pdf)),
             printlevel
         )
 
         fit_status = fit_result.status()
         cov_qual = fit_result.covQual()
-        if fit_status >= 0 and cov_qual >= 2:
+        status_ok = (fit_status == 0) or (fit_status == 1 and cov_qual >= 2)
+
+        
+        if fit_status != 0 or cov_qual < 2:
+            print(
+            f"[fit retry] {savename.stem}: "
+            f"attempt={attempt}, "
+            f"entries={h.GetEntries():.0f}, "
+            f"sumw={h.GetSumOfWeights():.1f}, "
+            f"status={fit_status}, "
+            f"covQual={cov_qual}, "
+            f"sig={sig_coeff.getVal():.2f}, "
+            f"sigErr={sig_coeff.getError():.2f}"
+        )
+
+        if status_ok and cov_qual >= 2 and sig_coeff.getError() > 0:
+        #if fit_status == 0 and cov_qual >= 2:
             sig_unc_ratio = sig_coeff.getError() / sig_coeff.getVal() if sig_coeff.getVal() > 0 else float('inf')
             
             tmp_frame = mass.frame(ROOT.RooFit.Title('tmp'))
@@ -323,7 +374,7 @@ class DotDict(dict):
         if key in self: del self[key]
         else: raise AttributeError(f"No attribute named {key}")
 
-
+"""
 def make_plotlist(cfg):
     plots = []
     out_path = Path('./eff_hists/test') if cfg.test else Path(cfg.output.output_dir)
@@ -343,7 +394,57 @@ def make_plotlist(cfg):
                 'var': var,
                 **assign_hist_format(f'{var}binned'),
             }))
+
     return plots
+"""
+
+def make_plotlist(cfg):
+    plots = []
+
+    out_path = Path('./eff_hists/test') if cfg.test else Path(cfg.output.output_dir)
+    data_in_path = Path(cfg.inputs.data_dir).parent / 'test' if cfg.test else Path(cfg.inputs.data_dir)
+    mc_in_path = Path(cfg.inputs.mc_dir).parent / 'test' if cfg.test else Path(cfg.inputs.mc_dir)
+
+    for plot_name, plot_dict in cfg.plots.items():
+
+        # Support both old and new config formats
+        if isinstance(plot_dict.triggers, dict):
+            triggers_cfg = plot_dict.triggers
+            data_trigger = triggers_cfg['data_trigger']
+            mc_triggers = triggers_cfg.get('mc_triggers', plot_dict.get('mc_triggers', []))
+        else:
+            data_trigger = plot_dict.triggers[0]
+            mc_triggers = plot_dict.get('mc_triggers', [])
+
+        if not mc_triggers:
+            raise RuntimeError(
+                f"No mc_triggers found for plot '{plot_name}'. "
+                "Check eff_plot_cfg_v2.yml nesting under triggers: mc_triggers."
+            )
+
+        weight_sum = sum(float(t['weight']) for t in mc_triggers)
+        print(f"[trigeff] {plot_name}: {len(mc_triggers)} MC trigger paths, weight sum = {weight_sum:.6f}")
+
+        # Fractions are rounded in the YAML, so do not use a 1e-6 tolerance.
+        assert abs(weight_sum - 1.0) < 5e-1, (
+            f"MC trigger weights for {plot_name} sum to {weight_sum}, not 1. "
+            "Check eff_plot_cfg_v2.yml."
+        )
+
+        for var in plot_dict.variables:
+            plots.append(DotDict({
+                'name': '_'.join([plot_name, f'{var}binned']),
+                'data_trigger': data_trigger,
+                'data_file': data_in_path / plot_dict.files.data,
+                'mc_file': mc_in_path / plot_dict.files.mc if hasattr(plot_dict.files, 'mc') else None,
+                'output_file': out_path / Path('_'.join(['eff', data_trigger, f'{var}binned'])).with_suffix('.pdf'),
+                'mc_triggers': mc_triggers,
+                'var': var,
+                **assign_hist_format(f'{var}binned'),
+            }))
+
+    return plots
+
 
 def get_hists(cfg):
     # Only for data, since MC is handled per-path
@@ -361,12 +462,12 @@ def get_hists(cfg):
         nbins = num_h.GetYaxis().GetNbins()
         for i in range(1, nbins + 1):
             try:
-                num_bin = num_h.ProjectionX('num_bin', i, i + 1)
+                num_bin = num_h.ProjectionX('num_bin', i, i)
                 # print(f'bin {i} num: ',num_bin.GetEntries())
             except AttributeError:
                 continue
             try:
-                denom_bin = denom_h.ProjectionX('denom_bin', i, i + 1)
+                denom_bin = denom_h.ProjectionX('denom_bin', i, i)
                 # print(f'bin {i} deonom: ',denom_bin.GetEntries())
             except AttributeError:
                 continue
@@ -424,8 +525,11 @@ def make_eff_plot_dict(cfg):
                 denom_hist = mc_file.Get(denom_hist_name)
                 effs = []
                 for ibin in range(1, n_bins + 1):
-                    num_proj = num_hist.ProjectionX('num_bin', ibin, ibin + 1)
-                    denom_proj = denom_hist.ProjectionX('denom_bin', ibin, ibin + 1)
+                    #num_proj = num_hist.ProjectionX('num_bin', ibin, ibin)
+                    #denom_proj = denom_hist.ProjectionX('denom_bin', ibin, ibin)
+                    safe_path = path.replace('.', 'p').replace('-', '_')
+                    num_proj = num_hist.ProjectionX(f'num_bin_mc_{safe_path}_{ibin}', ibin, ibin)
+                    denom_proj = denom_hist.ProjectionX(f'denom_bin_mc_{safe_path}_{ibin}', ibin, ibin)
                     
                     if denom_proj.GetSumOfWeights() > 0:
                         nNum, nNum_err = get_event_count(num_proj)
@@ -494,9 +598,13 @@ def plot_efficiencies(eff_dicts, test=False):
         eff_mc = ROOT.TEfficiency(h_num_mc, h_denom_mc)
         eff_mc.SetStatisticOption(ROOT.TEfficiency.kFNormal)
 
+        # Make plot range nicer for visualization
+        plot_xmax = 20 if bins[-1] >= 900 else bins[-1]
+
         eff_plot = EfficiencyPlot(init_params={
             'title_string': ' ;' + d["xlabel"] + ';Efficiency',
-            'xrange': (bins[0], bins[-1]),
+            #'xrange': (bins[0], bins[-1]),
+            'xrange': (bins[0], plot_xmax),
             'yrange': (0., 1.1),
             'leg_scale': .65,
             'leg_header': '',
@@ -554,12 +662,40 @@ def make_sf_json(cfg, eff_dicts):
         data_ratio_out = [ (round(r.n, 3), round(r.s, 3)) if r is not None else None for r in data_ratio]
         mc_ratio_out = [ (round(r.n, 3), round(r.s, 3)) if r is not None else None for r in mc_ratio]
 
+        edges = [float(x) for x in eff_dict['bins']]
+
+        # Treat the high edge as inf for cuts.yml
+        edges_for_cuts = edges[:]
+        if edges_for_cuts[-1] >= 900:
+            edges_for_cuts[-1] = "inf"
+
+        cut_bins = []
+        for i, sf in enumerate(sfs_out):
+            lo = edges_for_cuts[i]
+            hi = edges_for_cuts[i + 1]
+
+            if sf is None:
+                cut_bins.append([lo, hi, None, None])
+            else:
+                cut_bins.append([lo, hi, sf[0], sf[1]])
+
+        """
         output = {
             'binvar'    : binvar,
             'bins'      : list(eff_dict['bins'])[:-1],
             'sfs'       : sfs_out,
             'data_effs' : data_ratio_out,
             'mc_effs'   : mc_ratio_out,
+        }
+        """
+
+        output = {
+            'binvar': binvar,
+            'bin_edges': edges_for_cuts,
+            'cut_bins': cut_bins,
+            'sfs': sfs_out,
+            'data_effs': data_ratio_out,
+            'mc_effs': mc_ratio_out,
         }
 
         outputs[eff_dict['name']] = outputs.get(eff_dict['name'], copy.deepcopy(output))

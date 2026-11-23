@@ -9,3 +9,7 @@ eff_hists/*
 eff_plots/*
 mc_trig_eff_hists_v2/*
 plot_effs_v2/*
+
+eff_plots_*/
+crab_skimmer/crab_jobs/
+*.txt

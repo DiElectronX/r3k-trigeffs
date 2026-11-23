@@ -1,16 +1,16 @@
 inputs:
-  data_dir: eff_hists/10_14_25_low_dr/
-  mc_dir: eff_hists/10_14_25_low_dr/
+  data_dir: /eos/cms/store/group/phys_bphys/DiElectronX/jfratice/r3k-analysis/output/r3k-trigeff/TriggerEffHists/2022_trigger_OR/run4/data
+  mc_dir: /eos/cms/store/group/phys_bphys/DiElectronX/jfratice/r3k-analysis/output/r3k-trigeff/TriggerEffHists/2022_trigger_OR/run4/mc
   hist_dir: hists/
 
 output:
-  output_dir: eff_plots_v2/10_14_25_low_dr
+  output_dir: ./eff_plots_5_01_26_run1
 
 plots:
   trigger_OR:
     files:
-      data: effs_data_trigger_OR.root
-      mc: effs_jpsi_resonant.root
+      data: effs_data_2022_trigger_OR.root
+      mc: effs_mc_jpsi_resonant.root
     variables: [pt]
     triggers: 
       data_trigger: trigger_OR
@@ -34,7 +34,7 @@ plots:
       - path: L1_7p0_HLT_5p0 
         weight: 7.86E-2
       - path: L1_6p5_HLT_4p5 
-        weight: 1.07E-2
+        weight: 1.07E-1
       - path: L1_6p0_HLT_4p0 
         weight: 7.42E-2
       - path: L1_5p5_HLT_6p0 
